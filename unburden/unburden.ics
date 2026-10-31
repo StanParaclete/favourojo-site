@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Favour Ojo//Favour and Faves//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:unburden-2026-11-15@favourojo.com
+DTSTAMP:20261030T000000Z
+DTSTART:20261115T160000Z
+DTEND:20261115T190000Z
+SUMMARY:Favour & Faves: UNBURDEN
+DESCRIPTION:An intimate evening of worship\, music and community with Favour Ojo. Free admission. https://favourojo.com/unburden
+LOCATION:Café One\, Adeola Odeku\, Victoria Island\, Lagos
+URL:https://favourojo.com/unburden
+BEGIN:VALARM
+TRIGGER:-PT3H
+ACTION:DISPLAY
+DESCRIPTION:Favour & Faves: UNBURDEN starts at 5 PM
+END:VALARM
+END:VEVENT
+END:VCALENDAR

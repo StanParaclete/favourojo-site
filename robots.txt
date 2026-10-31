@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /unburden/door/
+Disallow: /unburden/release/
+Disallow: /unburden/walkin/
+Disallow: /unburden/admin/
+Disallow: /api/
+
+Sitemap: https://favourojo.com/sitemap.xml

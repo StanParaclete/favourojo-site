@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Release your seat — Favour &amp; Faves: UNBURDEN</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+  body { background: #000; color: var(--on-black); min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 28px var(--pad); }
+  .card { width: min(520px, 100%); }
+  .kick { font-size: 13px; font-weight: 700; color: var(--gold); }
+  h1 { margin-top: 14px; font-size: clamp(40px, 9vw, 64px); font-weight: 900; letter-spacing: -.05em; line-height: .9; text-transform: uppercase; }
+  .said { margin-top: 18px; font-size: clamp(21px, 4.4vw, 27px); line-height: 1.3; }
+  p.body { margin-top: 16px; font-size: 16px; line-height: 1.65; color: #cfcdc8; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  button.btn { font-family: inherit; cursor: pointer; border: 0; }
+  .btn-gold { background: var(--gold); color: #000; }
+  .btn-gold:hover { background: #fff; }
+  .btn[disabled] { opacity: .6; cursor: progress; transform: none; }
+  .err { margin-top: 14px; font-size: 14px; color: #ff8fb0; min-height: 1px; }
+  [data-show] { display: none; }
+  body[data-state="ask"] [data-show~="ask"],
+  body[data-state="done"] [data-show~="done"],
+  body[data-state="bad"] [data-show~="bad"] { display: block; }
+  body[data-state="ask"] .row[data-show~="ask"],
+  body[data-state="done"] .row[data-show~="done"],
+  body[data-state="bad"] .row[data-show~="bad"] { display: flex; }
+</style>
+</head>
+<body data-state="ask">
+  <main class="card">
+    <p class="kick">Favour &amp; Faves &middot; Sunday 15 November</p>
+    <h1>Unburden</h1>
+
+    <div data-show="ask">
+      <p class="said">Can’t make it any more?</p>
+      <p class="body">That’s okay. If you give your seat back, the people on the waitlist are told straight away, and one of them can come instead. This can’t be undone, but you’re welcome to register again if a seat is still free.</p>
+    </div>
+    <div class="row" data-show="ask">
+      <button class="btn btn-gold" id="go" type="button">Release my seat</button>
+      <a class="btn btn-ghost" href="/unburden/">Keep my seat</a>
+    </div>
+
+    <div data-show="done">
+      <p class="said" id="doneLine">Your seat has been released.</p>
+      <p class="body">Thank you for thinking of someone else. We hope to see you at the next one.</p>
+    </div>
+    <div class="row" data-show="done">
+      <a class="btn btn-light" href="https://www.instagram.com/thefavourojo" target="_blank" rel="noopener noreferrer">Follow @thefavourojo</a>
+      <a class="btn btn-ghost" href="/">Listen to her music</a>
+    </div>
+
+    <div data-show="bad">
+      <p class="said">This link doesn’t look right.</p>
+      <p class="body">Please open the “Release your seat” link straight from your confirmation or reminder email. If it still doesn’t work, reply to that email and we’ll sort it out.</p>
+    </div>
+
+    <p class="err" id="err" role="alert"></p>
+  </main>
+
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var k = q.get('k'), t = q.get('t');
+  var body = document.body, go = document.getElementById('go'), err = document.getElementById('err');
+  if (!k || !t) { body.setAttribute('data-state', 'bad'); return; }
+
+  /* nothing happens until the button is pressed - email scanners open links on their own */
+  go.addEventListener('click', function () {
+    err.textContent = ''; go.disabled = true; go.textContent = 'Releasing…';
+    fetch('/api/release', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ k: k, t: t }) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { s: r.status, d: d }; }); })
+      .then(function (res) {
+        go.disabled = false; go.textContent = 'Release my seat';
+        if (res.s === 200 && res.d.ok) {
+          if (res.d.already) document.getElementById('doneLine').textContent = 'This seat has already been released.';
+          else if (res.d.firstName) document.getElementById('doneLine').textContent = 'Thank you, ' + res.d.firstName + '. Your seat has been released.';
+          try { localStorage.removeItem('unburden-registered'); } catch (e) {}
+          body.setAttribute('data-state', 'done');
+          return;
+        }
+        if (res.s === 403 || res.s === 400) { body.setAttribute('data-state', 'bad'); return; }
+        err.textContent = res.d.error || 'Something went wrong. Please try again.';
+      })
+      .catch(function () {
+        go.disabled = false; go.textContent = 'Release my seat';
+        err.textContent = 'We couldn’t reach the server. Check your connection and try again.';
+      });
+  });
+})();
+</script>
+</body>
+</html>

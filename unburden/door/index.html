@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Door — UNBURDEN</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+  body { background: #000; color: var(--on-black); min-height: 100vh; min-height: 100svh; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 18px 16px 60px; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .top b { font-size: 15px; font-weight: 800; }
+  .top b span { color: var(--gold); }
+  .lock { background: none; border: 0; color: var(--dim-black); font: 600 13px 'Archivo', sans-serif; cursor: pointer; text-decoration: underline; }
+
+  /* key screen */
+  .gate { margin-top: 18vh; }
+  .gate h1 { font-size: 40px; font-weight: 900; letter-spacing: -.04em; line-height: 1; }
+  .gate p { margin-top: 10px; color: #b9b6b0; font-size: 15px; line-height: 1.55; }
+  .in { width: 100%; font: 500 18px 'Archivo', sans-serif; color: #fff; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.2); border-radius: 14px; padding: 16px; }
+  .in:focus { outline: none; border-color: var(--gold); }
+  .gate .in { margin-top: 22px; }
+  .go { margin-top: 12px; width: 100%; justify-content: center; font-family: inherit; border: 0; cursor: pointer; background: var(--gold); color: #000; font-size: 16px; padding: 16px; }
+  .err { margin-top: 12px; color: #ff8fb0; font-size: 14px; min-height: 1px; }
+
+  /* counter */
+  .tally { margin-top: 22px; display: flex; align-items: baseline; gap: 10px; }
+  .tally b { font-size: 64px; font-weight: 900; letter-spacing: -.05em; line-height: .9; font-variant-numeric: tabular-nums; }
+  .tally span { font-size: 16px; color: #b9b6b0; font-weight: 600; }
+  .bar { margin-top: 12px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: linear-gradient(to right, var(--gold), var(--magenta)); transition: width .5s; }
+
+  .tools { position: sticky; top: 0; z-index: 5; background: #000; padding: 16px 0 10px; margin-top: 10px; }
+  .filters { display: flex; gap: 8px; margin-top: 10px; }
+  .f { font: 700 13px 'Archivo', sans-serif; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.2); background: none; color: #b9b6b0; cursor: pointer; }
+  .f[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+
+  .list { list-style: none; }
+  .row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .who b { display: block; font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+  .who small { display: block; margin-top: 3px; font-size: 13px; color: var(--dim-black); }
+  .tap { min-width: 118px; font: 800 15px 'Archivo', sans-serif; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.25); background: none; color: #fff; cursor: pointer; }
+  .tap.on { background: var(--mint); color: #062b12; border-color: var(--mint); }
+  .tap[disabled] { opacity: .5; }
+  .row.on .who b { color: #9b9b9b; }
+  .empty { padding: 24px 0; color: var(--dim-black); }
+  .stamp { font-size: 12px; color: var(--dim-black); margin-top: 18px; }
+  .addw { margin-top: 12px; width: 100%; font: 800 15px 'Archivo', sans-serif; padding: 14px; border-radius: 12px; border: 1px dashed rgba(255,255,255,.35); background: none; color: #fff; cursor: pointer; }
+  .wform { margin-top: 12px; padding: 16px; border-radius: 16px; background: #141414; border: 1px solid rgba(255,255,255,.12); }
+  .wform[hidden] { display: none; }
+  .wform b { display: block; font-size: 16px; margin-bottom: 10px; }
+  .wform .in { margin-top: 8px; font-size: 16px; padding: 13px 14px; }
+  .wform .row2 { display: flex; gap: 8px; margin-top: 12px; }
+  .wform .save { flex: 1; font: 800 16px 'Archivo', sans-serif; padding: 14px; border: 0; border-radius: 12px; background: var(--gold); color: #000; cursor: pointer; }
+  .wform .cancel { font: 700 15px 'Archivo', sans-serif; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.25); background: none; color: #fff; cursor: pointer; }
+  .wmsg { margin-top: 10px; font-size: 14px; color: var(--mint); min-height: 1px; }
+  .wmsg.err { color: #ff8fb0; }
+  .tag { display: inline-block; margin-right: 6px; font-size: 10px; font-weight: 800; letter-spacing: .06em; padding: 2px 6px; border-radius: 3px; background: var(--gold); color: #000; vertical-align: 1px; }
+  .tap.rm { min-width: 0; font-size: 13px; padding: 10px 12px; color: #b9b6b0; border-color: rgba(255,255,255,.18); }
+  .sub { font-size: 13px; color: var(--dim-black); margin-top: 6px; }
+  .how { margin-top: 12px; font-size: 13.5px; line-height: 1.5; color: #b9b6b0; }
+  .how b { color: #fff; }
+
+  /* a scanned guest */
+  .scan { margin-top: 18px; padding: 20px; border-radius: 18px; background: #fff; color: #000; }
+  .scan[hidden] { display: none; }
+  .scan .k { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #706c65; }
+  .scan .nm { display: block; margin-top: 8px; font-size: 30px; font-weight: 900; letter-spacing: -.03em; line-height: 1.05; }
+  .scan .mt { display: block; margin-top: 6px; font-size: 14px; color: #4a4a4a; }
+  .scan .go-in { margin-top: 16px; width: 100%; font: 900 20px 'Archivo', sans-serif; padding: 20px; border: 0; border-radius: 14px; background: var(--black); color: #fff; cursor: pointer; }
+  .scan .next { margin-top: 10px; width: 100%; font: 700 15px 'Archivo', sans-serif; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,.2); background: none; color: #000; cursor: pointer; }
+  .scan.ok { background: var(--mint); }
+  .scan.ok .k { color: #0b4a1f; }
+  .scan.warn { background: #ffd6e4; }
+  .scan.bad { background: #ffd6e4; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top"><b>Door <span>&middot;</span> UNBURDEN</b><span><a class="lock" href="/unburden/admin/" style="margin-right:12px">Admin</a><button type="button" class="lock" id="lock" hidden>Lock this phone</button></span></div>
+
+  <section class="gate" id="gate">
+    <h1>Door check-in</h1>
+    <p>Enter the door key to see the guest list. It stays on this phone until you lock it.</p>
+    <form id="gateForm"><input class="in" id="keyIn" type="password" autocomplete="current-password" placeholder="Door key" aria-label="Door key">
+    <button class="btn go" type="submit">Open the list</button></form>
+    <p class="err" id="gateErr" role="alert"></p>
+  </section>
+
+  <section id="app" hidden>
+    <div class="scan" id="scan" hidden aria-live="assertive">
+      <span class="k" id="scanK">Scanned guest</span>
+      <b class="nm" id="scanName"></b>
+      <span class="mt" id="scanMeta"></span>
+      <button type="button" class="go-in" id="scanIn">Check in</button>
+      <button type="button" class="next" id="scanNext">Done · scan the next guest</button>
+    </div>
+
+    <div class="tally"><b id="arrived">0</b><span id="ofTotal">of 0 arrived</span></div>
+    <div class="bar"><i id="barFill"></i></div>
+    <p class="sub" id="subCount"></p>
+
+    <div class="tools">
+      <input class="in" id="search" type="search" placeholder="Search name, phone or number" aria-label="Search guests" autocomplete="off">
+      <div class="filters" role="group" aria-label="Show">
+        <button type="button" class="f" data-f="all" aria-pressed="true">Everyone</button>
+        <button type="button" class="f" data-f="out" aria-pressed="false">Not here yet</button>
+        <button type="button" class="f" data-f="in" aria-pressed="false">Arrived</button>
+      </div>
+    </div>
+    <button type="button" class="addw" id="addW">+ Add a walk-in (came without registering)</button>
+    <form class="wform" id="wForm" hidden novalidate>
+      <b>New walk-in</b>
+      <input class="in" name="name" placeholder="Full name" autocomplete="off" aria-label="Full name">
+      <input class="in" name="phone" type="tel" inputmode="tel" placeholder="Phone number" autocomplete="off" aria-label="Phone number">
+      <input class="in" name="email" type="email" inputmode="email" placeholder="Email (optional)" autocomplete="off" aria-label="Email, optional">
+      <div class="row2"><button type="submit" class="save" id="wSave">Save &amp; mark arrived</button><button type="button" class="cancel" id="wCancel">Cancel</button></div>
+      <p class="wmsg" id="wMsg" role="status"></p>
+    </form>
+    <p class="how"><b>To scan a guest’s code:</b> open this phone’s camera, point it at their code and tap the link. Use this same browser so you stay signed in. No code? Search their name.</p>
+    <ul class="list" id="list"></ul>
+    <p class="stamp" id="stamp"></p>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var KEY = 'unburden-door-key';
+  var key = null, rows = [], walkins = [], filter = 'all';
+  var scanId = (new URLSearchParams(location.search).get('c') || '').toLowerCase();
+  if (!/^[a-f0-9]{32}$/.test(scanId)) scanId = '';
+  var scanShown = false;
+  var $ = function (id) { return document.getElementById(id); };
+  var store = {
+    get: function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } },
+    set: function (v) { try { localStorage.setItem(KEY, v); } catch (e) {} },
+    clear: function () { try { localStorage.removeItem(KEY); } catch (e) {} }
+  };
+
+  function load(silent) {
+    return fetch('/api/door?key=' + encodeURIComponent(key), { cache: 'no-store' })
+      .then(function (r) { if (r.status === 401) throw new Error('key'); if (!r.ok) throw new Error('net'); return r.json(); })
+      .then(function (d) {
+        rows = d.rows; walkins = d.walkins || []; render();
+        if (scanId && !scanShown) { scanShown = true; renderScan(); }
+        $('stamp').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · refreshes every 20 seconds';
+      })
+      .catch(function (e) {
+        if (e.message === 'key') { store.clear(); showGate('That key didn’t work.'); }
+        else if (!silent) $('stamp').textContent = 'Couldn’t reach the server. Retrying…';
+      });
+  }
+
+  function counts() {
+    var a = rows.filter(function (r) { return r.in; }).length;
+    $('arrived').textContent = a + walkins.length;
+    $('ofTotal').textContent = 'arrived';
+    $('subCount').textContent = a + ' of ' + rows.length + ' registered guests · ' + walkins.length + ' walk-in' + (walkins.length === 1 ? '' : 's');
+    $('barFill').style.width = rows.length ? Math.min(100, a / rows.length * 100) + '%' : '0';
+  }
+
+  function render() {
+    counts();
+    var q = $('search').value.trim().toLowerCase().replace(/^#/, '');
+    var list = $('list'); list.innerHTML = '';
+    var shown = rows.concat(walkins).sort(function (x, y) { return x.name.localeCompare(y.name); }).filter(function (r) {
+      if (filter === 'in' && !r.in) return false;
+      if (filter === 'out' && r.in) return false;
+      if (!q) return true;
+      return r.name.toLowerCase().indexOf(q) > -1 || String(r.seat) === q || r.phone.indexOf(q) > -1 || (r.email || '').indexOf(q) > -1;
+    });
+    if (!shown.length) { list.innerHTML = '<li class="empty">No one matches.</li>'; return; }
+    shown.forEach(function (r) {
+      var li = document.createElement('li'); li.className = 'row' + (r.in ? ' on' : '');
+      li.innerHTML = '<div class="who"><b></b><small></small></div><button class="tap" type="button"></button>';
+      li.querySelector('b').textContent = r.name;
+      var btn = li.querySelector('.tap');
+      if (r.walkin) {
+        li.querySelector('small').innerHTML = '<span class="tag">WALK-IN</span>';
+        li.querySelector('small').appendChild(document.createTextNode((r.phone || '') + (r.by === 'self' ? ' · added themselves' : '')));
+        btn.textContent = 'Remove'; btn.className = 'tap rm';
+        btn.addEventListener('click', function () { removeWalkin(r, btn); });
+      } else {
+        li.querySelector('small').textContent = 'No. ' + r.seat + (r.phone ? ' · ' + r.phone : '');
+        btn.textContent = r.in ? 'Arrived ✓' : 'Check in';
+        btn.classList.toggle('on', !!r.in);
+        btn.addEventListener('click', function () { toggle(r, btn, li); });
+      }
+      list.appendChild(li);
+    });
+  }
+
+  function toggle(r, btn, li) {
+    var want = !r.in;
+    if (!want && !confirm('Undo check-in for ' + r.name + '?')) return;
+    btn.disabled = true;
+    fetch('/api/door', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key: key, id: r.id, in: want }) })
+      .then(function (res) { return res.json().then(function (d) { return { s: res.status, d: d }; }); })
+      .then(function (res) {
+        btn.disabled = false;
+        if (res.s !== 200) { alert(res.d.error || 'Couldn’t save. Try again.'); return; }
+        r.in = res.d.in; render();
+        if (want && $('search').value) { $('search').value = ''; render(); $('search').focus(); }
+      })
+      .catch(function () { btn.disabled = false; alert('No connection. Try again.'); });
+  }
+
+  /* ---- a guest's QR code was scanned ---- */
+  var hhmm = function (iso) { return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); };
+  function renderScan() {
+    var card = $('scan'), r = rows.filter(function (x) { return x.id === scanId; })[0];
+    card.hidden = false; card.className = 'scan';
+    $('scanIn').hidden = true;
+    if (!r) {
+      card.classList.add('bad');
+      $('scanK').textContent = 'Not on the guest list';
+      $('scanName').textContent = 'Code not found';
+      $('scanMeta').textContent = 'They may have given their seat back. Ask their name and search below.';
+    } else if (r.in) {
+      card.classList.add('warn');
+      $('scanK').textContent = 'Already checked in';
+      $('scanName').textContent = r.name;
+      $('scanMeta').textContent = 'Arrived at ' + hhmm(r.in) + ' · No. ' + r.seat;
+    } else {
+      $('scanK').textContent = 'Scanned guest';
+      $('scanName').textContent = r.name;
+      $('scanMeta').textContent = 'No. ' + r.seat + (r.phone ? ' · phone ' + r.phone : '');
+      $('scanIn').hidden = false; $('scanIn').disabled = false; $('scanIn').textContent = 'Check in';
+    }
+    card.scrollIntoView({ block: 'start' });
+  }
+  $('scanIn').addEventListener('click', function () {
+    var btn = $('scanIn'); btn.disabled = true; btn.textContent = 'Checking in…';
+    fetch('/api/door', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key: key, id: scanId, in: true }) })
+      .then(function (res) { return res.json().then(function (d) { return { s: res.status, d: d }; }); })
+      .then(function (res) {
+        if (res.s !== 200) { btn.disabled = false; btn.textContent = 'Check in'; alert(res.d.error || 'Couldn’t save. Try again.'); return; }
+        rows.forEach(function (x) { if (x.id === scanId) x.in = res.d.in; });
+        render();
+        var card = $('scan'); card.className = 'scan ok'; btn.hidden = true;
+        $('scanK').textContent = 'Checked in ✓ Welcome!';
+      })
+      .catch(function () { btn.disabled = false; btn.textContent = 'Check in'; alert('No connection. Try again.'); });
+  });
+  $('scanNext').addEventListener('click', function () {
+    $('scan').hidden = true; scanId = '';
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  });
+
+  /* ---- walk-ins ---- */
+  function removeWalkin(r, btn) {
+    if (!confirm('Remove walk-in ' + r.name + '? Only do this if it was added by mistake.')) return;
+    btn.disabled = true;
+    fetch('/api/door', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key: key, id: r.id, remove: true }) })
+      .then(function (res) { if (!res.ok) throw new Error(); walkins = walkins.filter(function (x) { return x.id !== r.id; }); render(); })
+      .catch(function () { btn.disabled = false; alert('Couldn’t remove. Try again.'); });
+  }
+  var wf = $('wForm');
+  $('addW').addEventListener('click', function () { wf.hidden = false; $('addW').hidden = true; $('wMsg').textContent = ''; wf.elements.name.focus(); });
+  $('wCancel').addEventListener('click', function () { wf.reset(); wf.hidden = true; $('addW').hidden = false; });
+  wf.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var msg = $('wMsg'); msg.className = 'wmsg'; msg.textContent = '';
+    var save = $('wSave'); save.disabled = true; save.textContent = 'Saving…';
+    fetch('/api/walkin', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
+      key: key, name: wf.elements.name.value, phone: wf.elements.phone.value, email: wf.elements.email.value
+    }) })
+      .then(function (res) { return res.json().then(function (d) { return { s: res.status, d: d }; }); })
+      .then(function (res) {
+        save.disabled = false; save.textContent = 'Save & mark arrived';
+        if (res.s !== 200 || !res.d.ok) {
+          msg.className = 'wmsg err';
+          msg.textContent = res.d.errors ? Object.keys(res.d.errors).map(function (k) { return res.d.errors[k]; }).join(' ') : (res.d.error || 'Couldn’t save. Try again.');
+          return;
+        }
+        msg.textContent = res.d.registered
+          ? 'They had registered, so they’re now checked in ✓'
+          : wf.elements.name.value.trim() + ' added as a walk-in ✓';
+        wf.reset(); wf.elements.name.focus();
+        load(true);
+      })
+      .catch(function () { save.disabled = false; save.textContent = 'Save & mark arrived'; msg.className = 'wmsg err'; msg.textContent = 'No connection. Try again.'; });
+  });
+
+  function showGate(msg) {
+    $('app').hidden = true; $('lock').hidden = true; $('gate').hidden = false;
+    $('gateErr').textContent = msg || ''; $('keyIn').value = ''; $('keyIn').focus();
+  }
+  function open() {
+    $('gate').hidden = true; $('app').hidden = false; $('lock').hidden = false;
+    load(); setInterval(function () { if (!document.hidden) load(true); }, 20000);
+  }
+
+  $('gateForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    key = $('keyIn').value.trim(); if (!key) return;
+    fetch('/api/door?key=' + encodeURIComponent(key), { cache: 'no-store' }).then(function (r) {
+      if (r.status === 401) { $('gateErr').textContent = 'That key didn’t work.'; return; }
+      store.set(key); open();
+    }).catch(function () { $('gateErr').textContent = 'Couldn’t reach the server.'; });
+  });
+  $('lock').addEventListener('click', function () { store.clear(); key = null; location.reload(); });
+  $('search').addEventListener('input', render);
+  Array.prototype.forEach.call(document.querySelectorAll('.f'), function (b) {
+    b.addEventListener('click', function () {
+      filter = b.dataset.f;
+      Array.prototype.forEach.call(document.querySelectorAll('.f'), function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      render();
+    });
+  });
+
+  key = store.get();
+  if (key) open(); else showGate();
+})();
+</script>
+</body>
+</html>

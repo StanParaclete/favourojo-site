@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Admin — UNBURDEN</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+  body { background: #0b0b0b; color: var(--on-black); min-height: 100vh; min-height: 100svh; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 18px var(--pad) 70px; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .top b { font-size: 16px; font-weight: 800; }
+  .top b span { color: var(--gold); }
+  .top-r { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--dim-black); }
+  .linkbtn { background: none; border: 0; color: var(--dim-black); font: 600 13px 'Archivo', sans-serif; cursor: pointer; text-decoration: underline; }
+  [hidden] { display: none !important; }
+
+  /* gate */
+  .gate { max-width: 440px; margin: 16vh auto 0; }
+  .gate h1 { font-size: 44px; font-weight: 900; letter-spacing: -.04em; line-height: 1; }
+  .gate p { margin-top: 10px; color: #b9b6b0; font-size: 15px; line-height: 1.55; }
+  .in { width: 100%; font: 500 17px 'Archivo', sans-serif; color: #fff; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.2); border-radius: 12px; padding: 14px 16px; }
+  .in:focus { outline: none; border-color: var(--gold); }
+  .gate .in { margin-top: 22px; }
+  .go { margin-top: 12px; width: 100%; justify-content: center; font-family: inherit; border: 0; cursor: pointer; background: var(--gold); color: #000; font-size: 16px; padding: 15px; }
+  .err { margin-top: 12px; color: #ff8fb0; font-size: 14px; min-height: 1px; }
+
+  /* headline */
+  .head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: 28px; }
+  .head h1 { font-size: clamp(34px, 5vw, 56px); font-weight: 900; letter-spacing: -.04em; line-height: .95; }
+  .head h1 span { display: block; font-size: 14px; font-weight: 700; letter-spacing: 0; color: var(--gold); margin-bottom: 8px; }
+  .when { font-size: 14px; color: #b9b6b0; text-align: right; }
+  .when b { display: block; color: #fff; font-size: 18px; }
+
+  /* stat cards */
+  .stats { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 12px; margin-top: 24px; }
+  .stat { background: #151515; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 16px; }
+  .stat small { display: block; font-size: 12px; font-weight: 700; color: var(--dim-black); text-transform: uppercase; letter-spacing: .06em; }
+  .stat b { display: block; margin-top: 8px; font-size: 34px; font-weight: 900; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat em { display: block; margin-top: 6px; font-style: normal; font-size: 12.5px; color: #8b8b8b; }
+  .stat .bar { margin-top: 10px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.1); overflow: hidden; }
+  .stat .bar i { display: block; height: 100%; background: linear-gradient(to right, var(--gold), var(--magenta)); }
+  .stat.gold { background: linear-gradient(145deg, #3b2c0d, #151515); border-color: rgba(201,168,76,.35); }
+  .stat.warn { border-color: rgba(255,92,138,.5); }
+  .stat.warn b { color: #ff8fb0; }
+
+  /* quick links */
+  .quick { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .quick a { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 999px; font-size: 14px; font-weight: 700; background: #151515; border: 1px solid rgba(255,255,255,.12); color: #fff; }
+  .quick a:hover { border-color: var(--gold); color: var(--gold); }
+  .quick a.prime { background: var(--gold); color: #000; border-color: var(--gold); }
+  .quick a.prime:hover { background: #fff; color: #000; }
+
+  /* chart */
+  .days { margin-top: 26px; background: #151515; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 18px; }
+  .days h2, .panel h2 { font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 110px; margin-top: 14px; }
+  .bars div { flex: 1; min-width: 6px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; height: 100%; }
+  .bars span { display: block; width: 100%; max-width: 34px; border-radius: 4px 4px 0 0; background: var(--gold); min-height: 3px; }
+  .bars small { font-size: 10.5px; color: #8b8b8b; white-space: nowrap; }
+  .empty { color: #8b8b8b; font-size: 14px; padding: 16px 0; }
+
+  /* tabs + tables */
+  .tabs-a { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+  .tabs-a button { font: 700 14px 'Archivo', sans-serif; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); background: none; color: #b9b6b0; cursor: pointer; }
+  .tabs-a button[aria-selected="true"] { background: #fff; color: #000; border-color: #fff; }
+  .tabs-a button i { font-style: normal; margin-left: 6px; opacity: .6; }
+  .panel { margin-top: 16px; background: #151515; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 18px; }
+  .ptools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .ptools .in { max-width: 360px; padding: 11px 14px; font-size: 15px; }
+  .dl { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; font-size: 14px; font-weight: 700; background: rgba(255,255,255,.08); color: #fff; }
+  .dl:hover { background: var(--gold); color: #000; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #8b8b8b; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  td { padding: 11px 10px; border-bottom: 1px solid rgba(255,255,255,.06); vertical-align: top; }
+  td.n { color: #8b8b8b; font-variant-numeric: tabular-nums; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .pill.ok { background: rgba(120,216,144,.18); color: var(--mint); }
+  .pill.no { background: rgba(255,255,255,.08); color: #8b8b8b; }
+  .pill.bad { background: rgba(255,92,138,.18); color: #ff8fb0; }
+  .songbar { display: grid; grid-template-columns: 180px 1fr 40px; align-items: center; gap: 12px; padding: 8px 0; }
+  .songbar i { display: block; height: 8px; border-radius: 4px; background: var(--gold); }
+  .songbar b { font-weight: 700; }
+  .songbar span { text-align: right; color: #b9b6b0; font-variant-numeric: tabular-nums; }
+  .note { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .note p { font-size: 15.5px; line-height: 1.6; white-space: pre-wrap; }
+  .note small { display: block; margin-top: 6px; font-size: 12px; color: #8b8b8b; }
+  .stamp { margin-top: 18px; font-size: 12px; color: #8b8b8b; }
+
+  @media (max-width: 1000px) { .stats { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .when { text-align: left; }
+    /* tables become cards on a phone */
+    table, thead, tbody, tr, td { display: block; }
+    thead { display: none; }
+    tr { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+    td { padding: 2px 0; border: 0; }
+    td[data-l]::before { content: attr(data-l) ': '; color: #8b8b8b; font-size: 12px; }
+    td.big { font-size: 16px; font-weight: 800; }
+    .songbar { grid-template-columns: 120px 1fr 32px; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top"><b>UNBURDEN <span>&middot;</span> Admin</b><div class="top-r"><span id="stamp2"></span><button type="button" class="linkbtn" id="lock" hidden>Lock</button></div></div>
+
+  <section class="gate" id="gate">
+    <h1>Event admin</h1>
+    <p>Enter the admin password (the same one the door volunteers use). It stays on this device until you lock it.</p>
+    <form id="gateForm"><input class="in" id="keyIn" type="password" autocomplete="current-password" placeholder="Password" aria-label="Admin password">
+    <button class="btn go" type="submit">Open</button></form>
+    <p class="err" id="gateErr" role="alert"></p>
+  </section>
+
+  <section id="app" hidden>
+    <div class="head">
+      <h1><span>Favour &amp; Faves &middot; Sunday 15 November</span>Everything at a glance</h1>
+      <div class="when" id="when"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat gold"><small>Registered</small><b id="sReg">0</b><em id="sRegSub">of 100 seats</em><div class="bar"><i id="sRegBar" style="width:0"></i></div></div>
+      <div class="stat"><small>Arrived</small><b id="sIn">0</b><em id="sInSub">checked in at the door</em></div>
+      <div class="stat"><small>Walk-ins</small><b id="sWalk">0</b><em>came without registering</em></div>
+      <div class="stat"><small>Waitlist</small><b id="sWait">0</b><em>waiting for a seat</em></div>
+      <div class="stat"><small>Prayer notes</small><b id="sNotes">0</b><em>laid down so far</em></div>
+      <div class="stat" id="sMailCard"><small>Emails not sent</small><b id="sMail">0</b><em id="sMailSub">confirmation failed</em></div>
+    </div>
+
+    <div class="quick">
+      <a class="prime" href="/unburden/door/">Open door check-in</a>
+      <a href="/unburden/" target="_blank" rel="noopener">Event page</a>
+      <a href="/unburden/walkin/" target="_blank" rel="noopener">Walk-in form</a>
+    </div>
+
+    <div class="days">
+      <h2>Sign-ups per day</h2>
+      <div class="bars" id="bars"></div>
+    </div>
+
+    <div class="tabs-a" role="tablist" aria-label="Lists">
+      <button type="button" role="tab" data-t="regs" aria-selected="true">Registrations<i id="cRegs">0</i></button>
+      <button type="button" role="tab" data-t="walkins" aria-selected="false">Walk-ins<i id="cWalk">0</i></button>
+      <button type="button" role="tab" data-t="waitlist" aria-selected="false">Waitlist<i id="cWait">0</i></button>
+      <button type="button" role="tab" data-t="songs" aria-selected="false">Songs</button>
+      <button type="button" role="tab" data-t="notes" aria-selected="false">Prayer notes<i id="cNotes">0</i></button>
+    </div>
+
+    <div class="panel" id="p-regs">
+      <div class="ptools">
+        <input class="in" id="q" type="search" placeholder="Search name, email or phone" aria-label="Search registrations">
+        <a class="dl" data-dl="">Download spreadsheet</a>
+      </div>
+      <table><thead><tr><th>No.</th><th>Name</th><th>Phone</th><th>Email</th><th>Song</th><th>Registered</th><th>Email</th><th>Door</th></tr></thead><tbody id="tRegs"></tbody></table>
+    </div>
+    <div class="panel" id="p-walkins" hidden>
+      <div class="ptools"><h2>People who came without registering</h2><a class="dl" data-dl="&list=walkins">Download spreadsheet</a></div>
+      <table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Arrived</th><th>Added by</th></tr></thead><tbody id="tWalk"></tbody></table>
+    </div>
+    <div class="panel" id="p-waitlist" hidden>
+      <div class="ptools"><h2>Waiting for a seat (first come, first told)</h2><a class="dl" data-dl="&list=waitlist">Download spreadsheet</a></div>
+      <table><thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Email</th><th>Joined</th><th>Status</th></tr></thead><tbody id="tWait"></tbody></table>
+    </div>
+    <div class="panel" id="p-songs" hidden>
+      <h2>What people want to hear</h2>
+      <div id="songsBox" style="margin-top:12px"></div>
+    </div>
+    <div class="panel" id="p-notes" hidden>
+      <div class="ptools"><h2>For the prayer team (anonymous)</h2><a class="dl" data-notes="1">Download all notes</a></div>
+      <div id="notesBox"></div>
+    </div>
+
+    <p class="stamp" id="stamp"></p>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var KEY = 'unburden-door-key';                 /* shared with the door page: one sign-in */
+  var STARTS = new Date('2026-11-15T16:00:00Z');
+  var $ = function (id) { return document.getElementById(id); };
+  var key = null, data = null, timer = null;
+  var store = {
+    get: function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } },
+    set: function (v) { try { localStorage.setItem(KEY, v); } catch (e) {} },
+    clear: function () { try { localStorage.removeItem(KEY); } catch (e) {} }
+  };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var when = function (iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    return d.toLocaleDateString([], { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  function load(silent) {
+    return fetch('/api/admin?key=' + encodeURIComponent(key), { cache: 'no-store' })
+      .then(function (r) { if (r.status === 401) throw new Error('key'); if (!r.ok) throw new Error('net'); return r.json(); })
+      .then(function (d) { data = d; render(); var t = 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); $('stamp').textContent = t + ' · refreshes every 30 seconds'; $('stamp2').textContent = t; })
+      .catch(function (e) {
+        if (e.message === 'key') { store.clear(); showGate('That password didn’t work.'); }
+        else if (!silent) $('stamp').textContent = 'Couldn’t reach the server. Retrying…';
+      });
+  }
+
+  function render() {
+    var t = data.totals;
+    $('sReg').textContent = t.registered;
+    $('sRegSub').textContent = 'of ' + data.capacity + ' seats · ' + t.left + ' left';
+    $('sRegBar').style.width = Math.min(100, t.registered / data.capacity * 100) + '%';
+    $('sIn').textContent = t.arrived + t.walkins;
+    $('sInSub').textContent = t.arrived + ' registered + ' + t.walkins + ' walk-ins';
+    $('sWalk').textContent = t.walkins;
+    $('sWait').textContent = t.waitlist;
+    $('sNotes').textContent = t.notes;
+    $('sMail').textContent = t.emailFailed;
+    $('sMailCard').classList.toggle('warn', t.emailFailed > 0);
+    $('sMailSub').textContent = t.emailFailed > 0 ? 'check Resend is set up in Netlify' : 'all confirmations sent';
+    $('cRegs').textContent = t.registered; $('cWalk').textContent = t.walkins; $('cWait').textContent = data.waitlist.length; $('cNotes').textContent = t.notes;
+
+    var ms = STARTS - new Date();
+    $('when').innerHTML = ms > 0
+      ? '<b>' + Math.floor(ms / 86400000) + ' days ' + Math.floor(ms % 86400000 / 3600000) + ' hrs</b>until doors open (5 PM)'
+      : '<b>The evening has started</b>registration is closed';
+
+    /* sign-ups per day */
+    var days = Object.keys(data.perDay).sort();
+    if (!days.length) $('bars').innerHTML = '<p class="empty">No sign-ups yet.</p>';
+    else {
+      var max = Math.max.apply(null, days.map(function (d) { return data.perDay[d]; }));
+      $('bars').innerHTML = days.slice(-21).map(function (d) {
+        var n = data.perDay[d], dt = new Date(d + 'T12:00:00Z');
+        return '<div title="' + n + ' on ' + d + '"><small>' + n + '</small><span style="height:' + Math.max(3, n / max * 80) + 'px"></span><small>' + dt.toLocaleDateString([], { day: 'numeric', month: 'short' }) + '</small></div>';
+      }).join('');
+    }
+
+    renderRegs();
+    $('tWalk').innerHTML = data.walkins.length ? data.walkins.map(function (w) {
+      return '<tr><td class="big" data-l="">' + esc(w.name) + '</td><td data-l="Phone">' + esc(w.phone) + '</td><td data-l="Email">' + esc(w.email || '–') + '</td><td data-l="Arrived">' + when(w.at) + '</td><td data-l="Added by">' + (w.by === 'door' ? 'Door volunteer' : 'Themselves (poster)') + '</td></tr>';
+    }).join('') : '<tr><td colspan="5" class="empty">No walk-ins yet. They’re added at the door on the night.</td></tr>';
+    $('tWait').innerHTML = data.waitlist.length ? data.waitlist.map(function (w, i) {
+      var st = w.gotSeat ? '<span class="pill ok">Got a seat</span>' : w.notifiedAt ? '<span class="pill no">Told a seat opened</span>' : '<span class="pill no">Waiting</span>';
+      return '<tr><td class="n">' + (i + 1) + '</td><td class="big">' + esc(w.name) + '</td><td data-l="Phone">' + esc(w.phone) + '</td><td data-l="Email">' + esc(w.email) + '</td><td data-l="Joined">' + when(w.at) + '</td><td>' + st + '</td></tr>';
+    }).join('') : '<tr><td colspan="6" class="empty">Nobody on the waitlist. It only opens once every seat is taken.</td></tr>';
+
+    var top = Math.max(1, data.songs[0] ? data.songs[0].votes : 1);
+    var voted = data.songs.reduce(function (a, s) { return a + s.votes; }, 0);
+    $('songsBox').innerHTML = voted ? data.songs.map(function (s) {
+      return '<div class="songbar"><b>' + esc(s.title) + '</b><i style="width:' + Math.max(1, s.votes / top * 100) + '%;opacity:' + (s.votes ? 1 : .15) + '"></i><span>' + s.votes + '</span></div>';
+    }).join('') : '<p class="empty">No song picks yet.</p>';
+
+    $('notesBox').innerHTML = data.notes.length ? data.notes.map(function (n) {
+      return '<div class="note"><p>' + esc(n.text) + '</p><small>' + when(n.at) + '</small></div>';
+    }).join('') : '<p class="empty">No notes yet.</p>';
+  }
+
+  function renderRegs() {
+    var q = $('q').value.trim().toLowerCase();
+    var rows = data.regs.filter(function (r) {
+      return !q || (r.name + ' ' + r.email + ' ' + r.phone).toLowerCase().indexOf(q) > -1;
+    });
+    $('tRegs').innerHTML = rows.length ? rows.map(function (r) {
+      return '<tr><td class="n">' + r.no + '</td><td class="big">' + esc(r.name) + '</td><td data-l="Phone">' + esc(r.phone) + '</td><td data-l="Email">' + esc(r.email) + '</td><td data-l="Song">' + esc(r.song || '–') + '</td><td data-l="Registered">' + when(r.registeredAt) + '</td><td>' +
+        (r.emailed ? '<span class="pill ok">Sent</span>' : '<span class="pill bad">Not sent</span>') + '</td><td>' +
+        (r.checkedInAt ? '<span class="pill ok">Arrived ' + new Date(r.checkedInAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span>' : '<span class="pill no">Not yet</span>') + '</td></tr>';
+    }).join('') : '<tr><td colspan="8" class="empty">' + (q ? 'No one matches.' : 'No registrations yet.') + '</td></tr>';
+  }
+
+  /* tabs */
+  Array.prototype.forEach.call(document.querySelectorAll('.tabs-a button'), function (b) {
+    b.addEventListener('click', function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.tabs-a button'), function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+      ['regs', 'walkins', 'waitlist', 'songs', 'notes'].forEach(function (t) { $('p-' + t).hidden = t !== b.dataset.t; });
+    });
+  });
+  $('q').addEventListener('input', function () { if (data) renderRegs(); });
+
+  function wireDownloads() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dl]'), function (a) {
+      a.href = '/api/registrations?key=' + encodeURIComponent(key) + a.getAttribute('data-dl');
+    });
+    var n = document.querySelector('[data-notes]'); if (n) n.href = '/api/burdens?key=' + encodeURIComponent(key);
+  }
+
+  function showGate(msg) {
+    clearInterval(timer);
+    $('app').hidden = true; $('lock').hidden = true; $('gate').hidden = false;
+    $('gateErr').textContent = msg || ''; $('keyIn').value = ''; $('keyIn').focus();
+  }
+  function open() {
+    $('gate').hidden = true; $('app').hidden = false; $('lock').hidden = false;
+    wireDownloads(); load();
+    timer = setInterval(function () { if (!document.hidden) load(true); }, 30000);
+  }
+  $('gateForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    key = $('keyIn').value.trim(); if (!key) return;
+    fetch('/api/admin?key=' + encodeURIComponent(key), { cache: 'no-store' }).then(function (r) {
+      if (r.status === 401) { $('gateErr').textContent = 'That password didn’t work.'; return; }
+      store.set(key); open();
+    }).catch(function () { $('gateErr').textContent = 'Couldn’t reach the server.'; });
+  });
+  $('lock').addEventListener('click', function () { store.clear(); key = null; location.reload(); });
+
+  key = store.get();
+  if (key) open(); else showGate();
+})();
+</script>
+</body>
+</html>
