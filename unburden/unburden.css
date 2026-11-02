@@ -77,20 +77,40 @@
 .ev-seats { font-size: 13.5px; font-weight: 600; color: #b9b6b0; }
 .ev-seats b { color: #fff; }
 
-/* ================= TICKER ================= */
-.ticker {
-  background: var(--gold); color: #16120a; overflow: hidden;
-  border-top: 1px solid rgba(0,0,0,.2);
+/* ================= 3D ROLL =================
+   The event details wrapped around a slowly turning cylinder.
+   roll.js measures the words and places each one on the drum. */
+.roll {
+  position: relative; overflow: hidden; background: #000;
+  height: clamp(96px, 11vw, 150px);
+  border-top: 1px solid rgba(255,255,255,.08); border-bottom: 1px solid rgba(255,255,255,.08);
 }
-.ticker-track {
-  display: flex; align-items: center; width: max-content;
-  padding: 13px 0; gap: 22px;
-  font-size: 14px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap;
-  animation: tick 38s linear infinite;
+.roll::before {          /* soft gold glow behind the drum */
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(60% 120% at 50% 50%, rgba(201,168,76,.16), transparent 70%);
 }
-.ticker-track i { width: 6px; height: 6px; border-radius: 50%; background: #16120a; flex: none; }
-.ticker:hover .ticker-track { animation-play-state: paused; }
-@keyframes tick { to { transform: translateX(calc(-50% - 11px)); } }
+.roll-stage {
+  position: absolute; inset: 0; perspective: 1100px; perspective-origin: 50% 30%;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
+          mask-image: linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);
+}
+.roll-drum {
+  position: absolute; left: 50%; top: 50%; width: 0; height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-8deg) translateZ(calc(var(--r, 500px) * -1)) rotateY(0deg);
+  animation: roll-spin 60s linear infinite;
+}
+.roll-drum span {
+  position: absolute; left: 0; top: 0;
+  white-space: nowrap; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  font-weight: 900; letter-spacing: -.02em; text-transform: uppercase; line-height: 1;
+  font-size: clamp(26px, 3.4vw, 50px); color: #f4f1ea;
+}
+.roll-drum span.g { color: var(--gold); font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: clamp(30px, 3.9vw, 58px); }
+.roll-drum span.d { color: var(--magenta, #e0457b); font-size: clamp(16px, 1.8vw, 26px); }
+.roll:hover .roll-drum { animation-play-state: paused; }
+@keyframes roll-spin { to { transform: rotateX(-8deg) translateZ(calc(var(--r, 500px) * -1)) rotateY(-360deg); } }
+
 
 /* ================= THE EVENING ================= */
 .ev-grid {
@@ -214,13 +234,11 @@
   .trip-p img { object-position: 37% 35%; }   /* keeps her face in the middle panel on a phone */
   .ev-side { max-width: none; }
   .ev-fact { grid-template-columns: 86px 1fr; gap: 12px; }
-  .ticker-track { font-size: 12.5px; padding: 11px 0; animation-duration: 30s; }
   .reg-actions .btn { flex: 1 1 auto; justify-content: center; }
 }
 @media (prefers-reduced-motion: reduce) {
   .trip-p, .trip-p img { animation: none; clip-path: none; transform: none; }
-  .ticker-track { animation: none; flex-wrap: wrap; width: auto; padding: 13px var(--pad); row-gap: 8px; }
-  .ticker-track > :nth-child(n+13) { display: none; }
+  .roll-drum { animation: none; }
 }
 
 /* =========================================================
