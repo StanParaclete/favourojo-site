@@ -470,3 +470,14 @@
 .checkin .bring-title { color: #000; }
 .checkin .bring-sub { color: #4a4a4a; }
 @media (max-width: 420px) { .checkin { flex-direction: column; align-items: flex-start; } .checkin img { width: 180px; height: 180px; } }
+
+/* ---------- the official flyers ---------- */
+.flyer-wrap { background: #021329; color: #f4f1ea; }
+.flyer-band .band-head { border-bottom-color: rgba(255,255,255,.12); }
+.flyer-band .band-sub { color: rgba(244,241,234,.72); }
+.flyers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(16px, 3vw, 40px); margin-top: clamp(28px, 4vw, 48px); max-width: 1100px; }
+.flyer { margin: 0; }
+.flyer img { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.8); }
+.flyer figcaption { margin-top: 14px; }
+.flyer .band-link { color: #f4f1ea; }
+@media (max-width: 640px) { .flyers { grid-template-columns: 1fr; } }
