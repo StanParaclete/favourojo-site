@@ -49,6 +49,8 @@
   .stat.gold { background: linear-gradient(145deg, #3b2c0d, #151515); border-color: rgba(201,168,76,.35); }
   .stat.warn { border-color: rgba(255,92,138,.5); }
   .stat.warn b { color: #ff8fb0; }
+  .resend { margin-top: 10px; padding: 8px 12px; border: 0; border-radius: 999px; background: #ff8fb0; color: #000; font: 700 12.5px/1 inherit; font-family: inherit; cursor: pointer; }
+  .resend:disabled { opacity: .6; cursor: default; }
 
   /* quick links */
   .quick { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
@@ -132,7 +134,7 @@
       <div class="stat"><small>Walk-ins</small><b id="sWalk">0</b><em>came without registering</em></div>
       <div class="stat"><small>Waitlist</small><b id="sWait">0</b><em>waiting for a seat</em></div>
       <div class="stat"><small>Prayer notes</small><b id="sNotes">0</b><em>laid down so far</em></div>
-      <div class="stat" id="sMailCard"><small>Emails not sent</small><b id="sMail">0</b><em id="sMailSub">confirmation failed</em></div>
+      <div class="stat" id="sMailCard"><small>Emails not sent</small><b id="sMail">0</b><em id="sMailSub">confirmation failed</em><button type="button" class="resend" id="resend" hidden>Send them now</button></div>
     </div>
 
     <div class="quick">
@@ -224,6 +226,7 @@
     $('sMail').textContent = t.emailFailed;
     $('sMailCard').classList.toggle('warn', t.emailFailed > 0);
     $('sMailSub').textContent = t.emailFailed > 0 ? 'check Resend is set up in Netlify' : 'all confirmations sent';
+    $('resend').hidden = !(t.emailFailed > 0);
     $('cRegs').textContent = t.registered; $('cWalk').textContent = t.walkins; $('cWait').textContent = data.waitlist.length; $('cNotes').textContent = t.notes;
 
     var ms = STARTS - new Date();
@@ -307,6 +310,16 @@
       if (r.status === 401) { $('gateErr').textContent = 'That password didn’t work.'; return; }
       store.set(key); open();
     }).catch(function () { $('gateErr').textContent = 'Couldn’t reach the server.'; });
+  });
+  $('resend').addEventListener('click', function () {
+    var b = this; b.disabled = true; b.textContent = 'Sending…';
+    fetch('/api/admin', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key: key, action: 'resend' }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        b.textContent = d.sent ? 'Sent ' + d.sent + (d.failed ? ', ' + d.failed + ' failed' : '') : 'Not sent: add the Resend key in Netlify first';
+        setTimeout(function () { b.disabled = false; b.textContent = 'Send them now'; load(true); }, 4000);
+      })
+      .catch(function () { b.disabled = false; b.textContent = 'Try again'; });
   });
   $('lock').addEventListener('click', function () { store.clear(); key = null; location.reload(); });
 

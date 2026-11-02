@@ -4,7 +4,8 @@
 
 import { getStore } from '@netlify/blobs';
 import { EVENT, STORE_NAME, json } from '../lib/event.mjs';
-import { SONGS, adminOk } from '../lib/extras.mjs';
+import { SONGS, adminOk, ensureToken, releaseUrl, idFromKey } from '../lib/extras.mjs';
+import { sendConfirmation } from '../lib/email.mjs';
 
 const songTitle = (slug) => (SONGS.find((s) => s.slug === slug) || {}).title || '';
 
@@ -13,9 +14,36 @@ async function all(store, prefix) {
   return (await Promise.all(blobs.map((b) => store.get(b.key, { type: 'json' }).then((d) => d && { _key: b.key, ...d })))).filter(Boolean);
 }
 
+/* POST { key, action: 'resend' } -> sends the confirmation email (with the
+   check-in QR) to everyone whose first one didn't go out, e.g. people who
+   registered before the Resend key was added. */
+async function resendMissing(store) {
+  const regs = (await all(store, 'reg/')).filter((r) => r.seat > 0 && !r.emailed);
+  let sent = 0, failed = 0;
+  for (const r of regs) {
+    const key = r._key;
+    const { _key, ...rec } = r;
+    const token = await ensureToken(store, key, rec);
+    const ok = await sendConfirmation({ to: rec.email, firstName: rec.name.split(' ')[0], seat: rec.seat, releaseUrl: releaseUrl(key, token), qrId: idFromKey(key) });
+    if (ok) {
+      const now = await store.get(key, { type: 'json' });
+      if (now) await store.setJSON(key, { ...now, emailed: true, lastSentAt: new Date().toISOString() });
+      sent++;
+    } else failed++;
+  }
+  return { sent, failed };
+}
+
 export default async (req) => {
-  if (!adminOk(new URL(req.url).searchParams.get('key'))) return json(401, { error: 'Wrong password' });
   const store = getStore({ name: STORE_NAME, consistency: 'strong' });
+  if (req.method === 'POST') {
+    let body = {};
+    try { body = await req.json(); } catch {}
+    if (!adminOk(body.key)) return json(401, { error: 'Wrong password' });
+    if (body.action !== 'resend') return json(400, { error: 'Unknown action' });
+    return json(200, { ok: true, ...(await resendMissing(store)) });
+  }
+  if (!adminOk(new URL(req.url).searchParams.get('key'))) return json(401, { error: 'Wrong password' });
 
   const [regsRaw, walkinsRaw, waitRaw, notesRaw] = await Promise.all([
     all(store, 'reg/'), all(store, 'walkin/'), all(store, 'wait/'), all(store, 'burden/'),
