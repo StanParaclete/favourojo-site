@@ -72,11 +72,21 @@ export const idFromKey = (key) => key.replace(/^reg\//, '');
 export const releaseUrl = (key, token) =>
   `${EVENT.pageUrl}/release/?k=${encodeURIComponent(idFromKey(key))}&t=${encodeURIComponent(token)}`;
 
+/* The admin/door password. Only its SHA-256 fingerprint lives in the code
+   (the repo is public), so the password itself can't be read from here.
+   An ADMIN_KEY set in Netlify's environment variables also works. */
+const ADMIN_HASH = '54365596b73754a581f8cbae82ef7be6a6cb5c39703e4cbf1b76cf7eedad2640';
+
 export function adminOk(given) {
+  if (!given) return false;
+  const g = String(given).trim();
   const admin = process.env.ADMIN_KEY;
-  if (!admin || !given) return false;
-  const x = Buffer.from(String(given)), y = Buffer.from(String(admin));
-  return x.length === y.length && timingSafeEqual(x, y);
+  if (admin) {
+    const x = Buffer.from(g), y = Buffer.from(String(admin));
+    if (x.length === y.length && timingSafeEqual(x, y)) return true;
+  }
+  const h = Buffer.from(createHash('sha256').update(g).digest('hex'));
+  return timingSafeEqual(h, Buffer.from(ADMIN_HASH));
 }
 
 /* takes 1 off a counter, never below zero */

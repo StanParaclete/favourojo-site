@@ -165,7 +165,7 @@ export function seatOpenEmail(firstName) {
 
 function creds() {
   const key = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
+  const from = process.env.EMAIL_FROM || 'Favour Ojo <hello@favourojo.com>';
   return key && from ? { key, from } : null;
 }
 
