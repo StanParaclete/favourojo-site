@@ -19,8 +19,9 @@ export const EVENT = {
   replyTo: 'favourojoministry@gmail.com',
 
   /* seats */
-  capacity: 100,
-  lowWhen: 15,        /* show "Almost full" when this many seats or fewer are left */
+  capacity: 999,      /* no real limit: the organisers chose open registration (Nov 2026) */
+  unlimited: true,
+  lowWhen: 0,         /* show "Almost full" when this many seats or fewer are left */
 
   /* registration closes when the doors open: 5 PM Lagos = 16:00 UTC */
   closesAt: '2026-11-15T16:00:00Z',

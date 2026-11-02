@@ -129,7 +129,7 @@
     </div>
 
     <div class="stats">
-      <div class="stat gold"><small>Registered</small><b id="sReg">0</b><em id="sRegSub">of 100 seats</em><div class="bar"><i id="sRegBar" style="width:0"></i></div></div>
+      <div class="stat gold"><small>Registered</small><b id="sReg">0</b><em id="sRegSub">&nbsp;</em><div class="bar"><i id="sRegBar" style="width:0"></i></div></div>
       <div class="stat"><small>Arrived</small><b id="sIn">0</b><em id="sInSub">checked in at the door</em></div>
       <div class="stat"><small>Walk-ins</small><b id="sWalk">0</b><em>came without registering</em></div>
       <div class="stat"><small>Waitlist</small><b id="sWait">0</b><em>waiting for a seat</em></div>
@@ -216,7 +216,8 @@
   function render() {
     var t = data.totals;
     $('sReg').textContent = t.registered;
-    $('sRegSub').textContent = 'of ' + data.capacity + ' seats · ' + t.left + ' left';
+    $('sRegSub').textContent = data.unlimited ? 'no seat limit' : 'of ' + data.capacity + ' seats · ' + t.left + ' left';
+    $('sRegBar').parentNode.hidden = !!data.unlimited;
     $('sRegBar').style.width = Math.min(100, t.registered / data.capacity * 100) + '%';
     $('sIn').textContent = t.arrived + t.walkins;
     $('sInSub').textContent = t.arrived + ' registered + ' + t.walkins + ' walk-ins';

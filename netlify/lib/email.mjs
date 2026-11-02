@@ -67,7 +67,7 @@ function layout({ kicker, line, intro, details = true, seat, buttons, outro, rel
         <span style="color:#8b8b8b;font-size:13px">Questions? Just reply to this email.</span>
       </td></tr>
       ${releaseUrl ? `<tr><td style="padding:16px 32px 30px;border-top:1px solid #2a2a2a;font:400 13px/1.6 Arial,sans-serif;color:#8b8b8b">
-        Can’t make it any more? <a href="${releaseUrl}" style="color:#c9a84c">Release your seat</a> so someone on the waitlist can have it.
+        Can’t make it any more? <a href="${releaseUrl}" style="color:#c9a84c">Release your seat</a> so we know not to expect you.
       </td></tr>` : ''}
     </table>
     <div style="font:400 12px/1.5 Arial,sans-serif;color:#6b6b6b;margin-top:16px">
@@ -119,7 +119,7 @@ export function reminderEmail(kind, firstName, { seat, releaseUrl, qrId } = {}) 
   const lead = tomorrow
     ? 'Just a reminder that Favour &amp; Faves: UNBURDEN is tomorrow, and your seat is waiting for you.'
     : 'It’s today! Favour &amp; Faves: UNBURDEN starts at 5:00 PM, and your seat is waiting for you.';
-  const tip = 'Give yourself time for Lagos traffic. Seats are limited, so please come a little early. If your plans have changed, releasing your seat lets someone on the waitlist come instead.';
+  const tip = 'Give yourself time for Lagos traffic and please come a little early. If your plans have changed, use the link below to let us know.';
   const text = [
     `Hi ${firstName},`, '',
     lead.replace('&amp;', '&'), '',

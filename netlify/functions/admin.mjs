@@ -70,6 +70,7 @@ export default async (req) => {
 
   return json(200, {
     capacity: EVENT.capacity,
+    unlimited: !!EVENT.unlimited,
     closesAt: EVENT.closesAt,
     totals: {
       registered: regs.length,
