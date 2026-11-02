@@ -365,7 +365,7 @@ h2 { font-size: clamp(30px, 4.6vw, 58px); font-weight: 800; letter-spacing: -.03
 .foot-col a { display: block; font-size: 15px; font-weight: 500; padding: 6px 0; transition: color .16s; }
 .foot-col a:hover { color: var(--gold); }
 .foot-said { font-size: clamp(24px, 4vw, 50px); line-height: 1.22; max-width: 17ch; margin: clamp(42px, 5.5vw, 70px) 0 clamp(30px, 4vw, 46px); }
-.foot-end { display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; align-items: center; padding-top: 22px; border-top: 1px solid var(--hair-black); font-size: 13px; color: var(--dim-black); }
+.foot-end { display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; align-items: center; padding-top: 22px; padding-right: 96px; padding-bottom: 8px; border-top: 1px solid var(--hair-black); font-size: 13px; color: var(--dim-black); }
 .foot-end a:hover { color: var(--gold); }
 
 /* ================= RESPONSIVE ================= */
