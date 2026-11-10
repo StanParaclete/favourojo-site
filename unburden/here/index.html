@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check in — Favour &amp; Faves: UNBURDEN</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#021329">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+  body { background: #021329; color: #f4f1ea; min-height: 100vh; min-height: 100svh; padding: 30px var(--pad) 48px; }
+  main { width: min(500px, 100%); margin: 0 auto; }
+  .kick { font-size: 12px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: rgba(244,241,234,.7); }
+  .script { margin-top: 14px; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-weight: 400; font-size: clamp(44px, 13vw, 64px); line-height: .95; color: #f4f1ea; }
+  .script em { display: block; font-size: .62em; color: var(--gold); font-style: italic; }
+  .lead { margin-top: 18px; font-size: 17px; line-height: 1.55; color: rgba(244,241,234,.82); }
+  .card { margin-top: 26px; padding: 22px; border-radius: 20px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); }
+  .card h2 { font-size: 21px; font-weight: 800; letter-spacing: -.02em; }
+  .card p.sub { margin-top: 6px; font-size: 14.5px; line-height: 1.5; color: rgba(244,241,234,.7); }
+  form { margin-top: 18px; }
+  .field + .field { margin-top: 14px; }
+  label { display: block; font-size: 13px; font-weight: 700; color: #e4e2dd; margin-bottom: 7px; }
+  label span { margin-left: 6px; font-size: 11px; font-weight: 600; color: rgba(244,241,234,.55); text-transform: uppercase; letter-spacing: .06em; }
+  input { width: 100%; font: 500 17px 'Archivo', system-ui, sans-serif; color: #fff; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.22); border-radius: 12px; padding: 15px 16px; }
+  input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.25); }
+  .bad input { border-color: #ff5c8a; }
+  .ferr { margin-top: 6px; font-size: 13px; color: #ff8fb0; }
+  .ferr:empty, .err:empty { display: none; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .go { margin-top: 18px; width: 100%; justify-content: center; font-family: inherit; font-size: 17px; padding: 17px; border: 0; cursor: pointer; background: var(--gold); color: #000; }
+  .go.big { font-size: 19px; padding: 20px; }
+  .go[disabled] { opacity: .6; cursor: progress; transform: none; }
+  .link { margin-top: 16px; display: inline-block; background: none; border: 0; padding: 0; font: 600 15px 'Archivo', system-ui, sans-serif; color: var(--gold); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .err { margin-top: 12px; font-size: 14px; color: #ff8fb0; }
+  .fine { margin-top: 12px; font-size: 12.5px; color: rgba(244,241,234,.55); line-height: 1.5; }
+  .team { margin-top: 18px; font-size: 12.5px; font-weight: 700; color: #021329; background: var(--gold); display: inline-block; padding: 6px 10px; border-radius: 999px; }
+
+  /* the "you're in" screen they show the volunteer */
+  .done { margin-top: 26px; padding: 30px 22px 26px; border-radius: 24px; background: var(--mint, #7ee2a8); color: #062b12; text-align: center; }
+  .tick { width: 84px; height: 84px; margin: 0 auto 16px; border-radius: 50%; background: #062b12; display: grid; place-items: center; animation: pop .5s cubic-bezier(.2,1.6,.4,1) both; }
+  .tick svg { width: 44px; height: 44px; stroke: var(--mint, #7ee2a8); stroke-width: 3.2; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .45s .25s ease forwards; }
+  @keyframes pop { from { transform: scale(.4); opacity: 0; } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  .done b { display: block; font-size: 30px; font-weight: 900; letter-spacing: -.03em; line-height: 1.05; }
+  .done p { margin-top: 10px; font-size: 16px; line-height: 1.5; }
+  .clock { margin-top: 16px; font-size: 13px; font-weight: 800; letter-spacing: .04em; }
+  .clock i { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: #062b12; animation: blink 1s steps(2) infinite; vertical-align: 1px; }
+  @keyframes blink { 50% { opacity: .15; } }
+  @media (prefers-reduced-motion: reduce) { .tick, .tick svg, .clock i { animation: none; stroke-dashoffset: 0; } }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <p class="kick">Favour &amp; Faves &middot; Unburden</p>
+  <h1 class="script">Welcome<em>you made it</em></h1>
+
+  <!-- before the day -->
+  <section id="notyet" hidden>
+    <p class="lead">Check-in opens on <b>Sunday 15 November from 1 PM</b>, right here at the entrance. See you there.</p>
+    <a class="btn go" href="/unburden/#register">Not registered yet? Register now</a>
+  </section>
+
+  <!-- registered on this phone: one tap -->
+  <section class="card" id="me" hidden>
+    <h2 id="meHi">Hi!</h2>
+    <p class="sub">You registered on this phone. Tap below and you’re checked in.</p>
+    <button class="btn go big" id="meGo" type="button">Check me in</button>
+    <p class="err" id="meErr" role="alert"></p>
+    <button class="link" type="button" id="notMe">Not you? Check in someone else</button>
+  </section>
+
+  <!-- registered: find by email or phone -->
+  <section class="card" id="find" hidden>
+    <h2>Registered?</h2>
+    <p class="sub">Enter the email <b>or</b> phone number you registered with.</p>
+    <form id="ff" novalidate>
+      <div class="field"><label for="fe">Email</label><input id="fe" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160"></div>
+      <div class="field"><label for="fp">or phone number</label><input id="fp" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30"></div>
+      <div class="hp" aria-hidden="true"><label for="fw">Website</label><input id="fw" name="website" tabindex="-1" autocomplete="off"></div>
+      <button class="btn go" id="fGo" type="submit">Check me in</button>
+      <p class="err" id="fErr" role="alert"></p>
+    </form>
+    <button class="link" type="button" id="toWalk">I didn’t register</button>
+  </section>
+
+  <!-- not registered: walk-in -->
+  <section class="card" id="walk" hidden>
+    <h2 id="walkH">You’re still welcome</h2>
+    <p class="sub">Add your name and number so we can welcome you properly. It takes 20 seconds.</p>
+    <form id="wf" novalidate>
+      <div class="field"><label for="wn">Full name</label><input id="wn" name="name" autocomplete="name" maxlength="120"><p class="ferr" id="e-name"></p></div>
+      <div class="field"><label for="wp">Phone number</label><input id="wp" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30"><p class="ferr" id="e-phone"></p></div>
+      <div class="field"><label for="wm">Email <span>optional</span></label><input id="wm" name="email" type="email" inputmode="email" autocomplete="email" maxlength="160"><p class="ferr" id="e-email"></p></div>
+      <div class="hp" aria-hidden="true"><label for="ww">Website</label><input id="ww" name="website" tabindex="-1" autocomplete="off"></div>
+      <button class="btn go" id="wGo" type="submit">I’m here</button>
+      <p class="err" id="wErr" role="alert"></p>
+    </form>
+    <button class="link" type="button" id="toFind">Actually, I registered</button>
+  </section>
+
+  <!-- done -->
+  <section class="done" id="done" hidden tabindex="-1" aria-live="polite">
+    <div class="tick" aria-hidden="true"><svg viewBox="0 0 44 44"><path d="M11 23l7 7 15-16"/></svg></div>
+    <b id="doneTitle">You’re checked in!</b>
+    <p id="doneText">Show this screen to the volunteer at the door, then make yourself at home.</p>
+    <p class="clock"><i></i><span id="clock"></span></p>
+  </section>
+
+  <p class="team" id="team" hidden>Team test mode: works before the event day too</p>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var OPENS = new Date('2026-11-15T12:00:00Z'), CLOSES = new Date('2026-11-16T00:00:00Z');
+  var $ = function (id) { return document.getElementById(id); };
+  var get = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  var teamKey = get('unburden-door-key') || '';
+  var saved = null;
+  try { saved = JSON.parse(get('unburden-registered') || 'null'); } catch (e) {}
+  var shown = Date.now();
+  var now = new Date();
+  var open = now >= OPENS && now < CLOSES;
+
+  if (teamKey) $('team').hidden = false;
+  if (!open && !teamKey) { $('notyet').hidden = false; return; }
+
+  function show(id) { ['me', 'find', 'walk', 'done', 'notyet'].forEach(function (s) { $(s).hidden = s !== id; }); }
+  function post(url, body) {
+    body.key = teamKey || undefined; body.t = Date.now() - shown;
+    return fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { s: r.status, d: d }; }); });
+  }
+  function busy(btn, on, label) { btn.disabled = on; btn.textContent = on ? 'One moment…' : label; }
+  function done(title, text) {
+    $('doneTitle').textContent = title;
+    if (text) $('doneText').textContent = text;
+    show('done'); $('done').focus();
+    var tick = function () { $('clock').textContent = 'Checked in · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); };
+    tick(); setInterval(tick, 1000);   /* a live clock, so a screenshot can't be passed round */
+  }
+  function welcome(d) {
+    done(d.already ? 'Welcome back, ' + d.firstName + '!' : 'You’re in, ' + d.firstName + '!',
+      d.already ? 'You were already checked in. Show this screen to the volunteer and head in.' : null);
+  }
+  var NET = 'No connection. Please try again, or speak to the volunteer at the door.';
+
+  /* 1. registered on this phone */
+  if (saved && (saved.email || saved.id)) {
+    $('meHi').textContent = 'Hi ' + (saved.firstName || 'there') + '!';
+    show('me');
+  } else show('find');
+
+  $('meGo').addEventListener('click', function () {
+    var b = this; busy(b, true); $('meErr').textContent = '';
+    post('/api/here', { id: saved.id, email: saved.email }).then(function (r) {
+      busy(b, false, 'Check me in');
+      if (r.s === 200 && r.d.found) return welcome(r.d);
+      if (r.s === 200) { show('find'); $('fErr').textContent = 'We couldn’t find that registration. Try your email or phone below.'; return; }
+      if (r.d.state === 'notyet') return show('notyet');
+      $('meErr').textContent = r.d.error || NET;
+    }).catch(function () { busy(b, false, 'Check me in'); $('meErr').textContent = NET; });
+  });
+  $('notMe').addEventListener('click', function () { show('find'); $('fe').focus(); });
+  $('toWalk').addEventListener('click', function () { show('walk'); $('wn').focus(); });
+  $('toFind').addEventListener('click', function () { show('find'); $('fe').focus(); });
+
+  /* 2. find by email or phone */
+  var ff = $('ff');
+  ff.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = ff.elements.email.value.trim(), phone = ff.elements.phone.value.trim();
+    $('fErr').textContent = '';
+    if (!email && phone.replace(/\D/g, '').length < 10) { $('fErr').textContent = 'Enter your email or your phone number.'; return; }
+    var b = $('fGo'); busy(b, true);
+    post('/api/here', { email: email, phone: phone, website: ff.elements.website.value }).then(function (r) {
+      busy(b, false, 'Check me in');
+      if (r.s === 200 && r.d.found) return welcome(r.d);
+      if (r.s === 200) {
+        /* not registered: carry what they typed over to the walk-in form */
+        $('walkH').textContent = 'We couldn’t find a registration, but you’re still welcome';
+        if (email) $('wm').value = email;
+        if (phone) $('wp').value = phone;
+        show('walk'); $('wn').focus(); return;
+      }
+      if (r.d.state === 'notyet') return show('notyet');
+      $('fErr').textContent = r.d.error || NET;
+    }).catch(function () { busy(b, false, 'Check me in'); $('fErr').textContent = NET; });
+  });
+
+  /* 3. walk-in */
+  var wf = $('wf');
+  var ferr = function (k, m) { wf.elements[k].closest('.field').classList.toggle('bad', !!m); $('e-' + k).textContent = m || ''; };
+  wf.addEventListener('submit', function (e) {
+    e.preventDefault(); $('wErr').textContent = '';
+    var ok = true, m = wf.elements.email.value.trim(), d = wf.elements.phone.value.replace(/\D/g, '');
+    if (wf.elements.name.value.trim().length < 2) { ferr('name', 'Please enter your full name.'); ok = false; } else ferr('name');
+    if (d.length < 10 || d.length > 15) { ferr('phone', 'Please enter a valid phone number.'); ok = false; } else ferr('phone');
+    if (m && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m)) { ferr('email', 'That email doesn’t look right (or leave it empty).'); ok = false; } else ferr('email');
+    if (!ok) return;
+    var b = $('wGo'); busy(b, true);
+    post('/api/walkin', { name: wf.elements.name.value, phone: wf.elements.phone.value, email: m, website: wf.elements.website.value }).then(function (r) {
+      busy(b, false, 'I’m here');
+      var x = r.d || {};
+      if (r.s === 200 && x.ok) return done(x.registered ? 'You’d registered already, ' + x.firstName + '. You’re in!' : 'You’re in, ' + (x.firstName || '') + '. Welcome!');
+      if (x.state === 'notyet') return show('notyet');
+      if (x.errors) Object.keys(x.errors).forEach(function (k) { if (wf.elements[k]) ferr(k, x.errors[k]); });
+      $('wErr').textContent = x.error || NET;
+    }).catch(function () { busy(b, false, 'I’m here'); $('wErr').textContent = NET; });
+  });
+})();
+</script>
+</body>
+</html>

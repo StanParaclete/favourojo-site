@@ -3,6 +3,7 @@ Allow: /
 Disallow: /unburden/door/
 Disallow: /unburden/release/
 Disallow: /unburden/walkin/
+Disallow: /unburden/here/
 Disallow: /unburden/admin/
 Disallow: /api/
 
