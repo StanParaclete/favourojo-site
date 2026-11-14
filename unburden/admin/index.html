@@ -58,6 +58,13 @@
   .quick a:hover { border-color: var(--gold); color: var(--gold); }
   .quick a.prime { background: var(--gold); color: #000; border-color: var(--gold); }
   .quick a.prime:hover { background: #fff; color: #000; }
+  .mails { margin-top: 22px; padding: 20px 22px; border-radius: 18px; background: #111; border: 1px solid rgba(255,255,255,.1); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+  .mails h2 { font-size: 17px; font-weight: 800; }
+  .mails p { margin-top: 6px; font-size: 14px; line-height: 1.6; color: #b9b6b0; }
+  .mails .send { padding: 12px 18px; border-radius: 999px; border: 0; background: var(--gold); color: #000; font: 700 14px/1 inherit; font-family: inherit; cursor: pointer; }
+  .mails .send:disabled { opacity: .6; cursor: default; }
+  .mailmsg { flex-basis: 100%; margin-top: 0 !important; color: var(--gold) !important; font-weight: 700; }
+  .mailmsg:empty { display: none; }
 
   /* chart */
   .days { margin-top: 26px; background: #151515; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 18px; }
@@ -141,6 +148,16 @@
       <a class="prime" href="/unburden/door/">Open door check-in</a>
       <a href="/unburden/" target="_blank" rel="noopener">Event page</a>
       <a href="/unburden/walkin/" target="_blank" rel="noopener">Walk-in form</a>
+      <a href="/unburden/here/" target="_blank" rel="noopener">Entrance check-in page</a>
+    </div>
+
+    <div class="mails">
+      <div>
+        <h2>Emails to guests</h2>
+        <p id="mailLine">Loading…</p>
+      </div>
+      <button type="button" class="send" id="sendBefore">Send “Before you come” email</button>
+      <p class="mailmsg" id="mailMsg" role="status"></p>
     </div>
 
     <div class="days">
@@ -228,6 +245,13 @@
     $('sMailCard').classList.toggle('warn', t.emailFailed > 0);
     $('sMailSub').textContent = t.emailFailed > 0 ? 'check Resend is set up in Netlify' : 'all confirmations sent';
     $('resend').hidden = !(t.emailFailed > 0);
+    var m = data.mails || {};
+    $('mailLine').innerHTML = '“See you tomorrow” reminder: <b>' + (m.tomorrow || 0) + '</b> of ' + t.registered +
+      ' &nbsp;·&nbsp; “Before you come”: <b>' + (m.before || 0) + '</b> of ' + t.registered +
+      ' &nbsp;·&nbsp; “Tonight at 5 PM” (sends itself 15 Nov, 10 AM): <b>' + (m.today || 0) + '</b> of ' + t.registered;
+    var left = t.registered - (m.before || 0);
+    $('sendBefore').disabled = left <= 0;
+    if (!sending) $('sendBefore').textContent = left <= 0 ? '“Before you come” sent to everyone' : 'Send “Before you come” email' + (m.before ? ' to the other ' + left : ' to all ' + left);
     $('cRegs').textContent = t.registered; $('cWalk').textContent = t.walkins; $('cWait').textContent = data.waitlist.length; $('cNotes').textContent = t.notes;
 
     var ms = STARTS - new Date();
@@ -321,6 +345,20 @@
         setTimeout(function () { b.disabled = false; b.textContent = 'Send them now'; load(true); }, 4000);
       })
       .catch(function () { b.disabled = false; b.textContent = 'Try again'; });
+  });
+  var sending = false;
+  $('sendBefore').addEventListener('click', function () {
+    var b = this, left = data.totals.registered - ((data.mails || {}).before || 0);
+    if (!confirm('Send the “Before you come” email (Psalm 28:6–8, dress comfortably, open heart, ready to worship) to ' + left + ' guest' + (left === 1 ? '' : 's') + '? Each person only ever gets it once.')) return;
+    sending = true; b.disabled = true; b.textContent = 'Sending…'; $('mailMsg').textContent = '';
+    fetch('/api/admin', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key: key, action: 'before' }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        sending = false;
+        $('mailMsg').textContent = d.sent ? 'Sent to ' + d.sent + ' guest' + (d.sent === 1 ? '' : 's') + '.' : (d.attempted ? 'Sending failed. Check Resend, then try again.' : 'Everyone already has it.');
+        load(true);
+      })
+      .catch(function () { sending = false; b.disabled = false; b.textContent = 'Try again'; });
   });
   $('lock').addEventListener('click', function () { store.clear(); key = null; location.reload(); });
 

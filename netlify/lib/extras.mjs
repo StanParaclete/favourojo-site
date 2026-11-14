@@ -131,7 +131,8 @@ export async function notifyWaitlist(store, howMany = 3) {
 /* kind: 'tomorrow' | 'today'. Safe to run twice: each person is
    only ever sent each reminder once. */
 export async function runReminders(store, kind) {
-  const flag = kind === 'tomorrow' ? 'remindedTomorrow' : 'remindedToday';
+  const flag = { tomorrow: 'remindedTomorrow', today: 'remindedToday', before: 'sentBefore' }[kind];
+  if (!flag) throw new Error('unknown reminder kind ' + kind);
   const { blobs } = await store.list({ prefix: 'reg/' });
   const regs = (await Promise.all(blobs.map((b) => store.get(b.key, { type: 'json' }).then((d) => d && { key: b.key, rec: d }))))
     .filter((r) => r && r.rec.seat > 0 && !r.rec[flag]);

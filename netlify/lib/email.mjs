@@ -32,7 +32,7 @@ const pill = (href, label, solid) => solid
   : `<a href="${href}" style="display:inline-block;border:1px solid #555;color:#f2f0eb;font:700 14px/1 Arial,sans-serif;padding:13px 22px;border-radius:999px;text-decoration:none;margin:0 8px 10px 0">${label}</a>`;
 
 /* one layout for every email */
-function layout({ kicker, line, intro, details = true, seat, buttons, outro, releaseUrl, qrId }) {
+function layout({ kicker, line, intro, details = true, seat, buttons, outro, releaseUrl, qrId, before }) {
   return `<!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#f4f2ee">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f2ee;padding:28px 12px">
@@ -52,6 +52,7 @@ function layout({ kicker, line, intro, details = true, seat, buttons, outro, rel
           ${row('Admission', esc(EVENT.admission))}
         </table>
       </td></tr>` : ''}
+      ${before ? beforeHtml() : ''}
       ${qrId ? `<tr><td style="padding:26px 32px 4px">
         <table role="presentation" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:14px"><tr>
           <td style="padding:14px"><img src="${EVENT.pageUrl.replace('/unburden', '')}/api/qr?id=${qrId}" width="140" height="140" alt="Your check-in code" style="display:block;width:140px;height:140px"></td>
@@ -77,6 +78,24 @@ function layout({ kicker, line, intro, details = true, seat, buttons, outro, rel
 </table>
 </body></html>`;
 }
+
+/* ---------- "Before you come": the four things the team asked guests to do ---------- */
+const PSALM = 'Blessed be the LORD, because he hath heard the voice of my supplications. The LORD is my strength and my shield; my heart trusted in him, and I am helped: therefore my heart greatly rejoiceth; and with my song will I praise him. The LORD is their strength, and he is the saving strength of his anointed.';
+export const BEFORE = [
+  ['Read Psalm 28:6–8 before you come.', 'Sit with these few lines before the evening. They are the heart of UNBURDEN, and we will carry them into worship together.', PSALM],
+  ['Dress comfortably.', 'We may take off our shoes and sit on rugs and cushions on the floor, so wear something you can relax and move in.'],
+  ['Come with an open heart.', 'Bring whatever you are carrying: the worry, the pressure, the question. This is a safe place to set it down.'],
+  ['Come ready to worship together.', 'This isn’t a concert to watch. It is an evening we share, so come ready to sing, to pray and to be still.'],
+];
+const beforeHtml = () => `<tr><td style="padding:26px 32px 4px">
+        <div style="font:700 12px/1 Arial,sans-serif;color:#c9a84c;letter-spacing:.12em;text-transform:uppercase">Before you come</div>
+        ${BEFORE.map((b, i) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px"><tr>
+          <td style="width:34px;vertical-align:top"><div style="width:26px;height:26px;border:1px solid #c9a84c;border-radius:50%;font:700 13px/26px Arial,sans-serif;color:#c9a84c;text-align:center">${i + 1}</div></td>
+          <td style="font:400 15px/1.6 Arial,sans-serif;color:#cfcdc8"><b style="color:#fff">${esc(b[0])}</b><br>${esc(b[1])}${b[2] ? `<div style="margin-top:10px;padding:12px 14px;border-left:2px solid #c9a84c;font:italic 400 15px/1.6 Georgia,serif;color:#e8e2d2">“${esc(b[2])}”<br><span style="font:600 12px/1 Arial,sans-serif;color:#8b8b8b;font-style:normal">Psalm 28:6–8 (KJV)</span></div>` : ''}</td>
+        </tr></table>`).join('')}
+        <div style="margin-top:16px;font:400 14px/1.6 Arial,sans-serif;color:#8b8b8b">And please arrive a little early, and keep your phone on silent.</div>
+      </td></tr>`;
+const beforeText = () => ['BEFORE YOU COME', ...BEFORE.flatMap((b, i) => [`${i + 1}. ${b[0]} ${b[1]}`, ...(b[2] ? [`   "${b[2]}" (Psalm 28:6-8, KJV)`] : [])]), 'And please arrive a little early, and keep your phone on silent.'];
 
 const detailsText = (seat) => [
   `Date: ${EVENT.dateLong}`,
@@ -110,8 +129,9 @@ export function confirmationEmail(firstName, { seat, releaseUrl, qrId } = {}) {
   return { subject, text, html };
 }
 
-/* kind: 'tomorrow' | 'today' */
+/* kind: 'tomorrow' | 'today' | 'before' (a one-off "Before you come" note sent from the dashboard) */
 export function reminderEmail(kind, firstName, { seat, releaseUrl, qrId } = {}) {
+  if (kind === 'before') return beforeEmail(firstName, { seat, releaseUrl, qrId });
   const tomorrow = kind === 'tomorrow';
   const subject = tomorrow
     ? 'See you tomorrow — Favour & Faves: UNBURDEN'
@@ -124,6 +144,7 @@ export function reminderEmail(kind, firstName, { seat, releaseUrl, qrId } = {}) 
     `Hi ${firstName},`, '',
     lead.replace('&amp;', '&'), '',
     ...detailsText(seat), '',
+    ...beforeText(), '',
     tip, '',
     `Directions: ${EVENT.mapsUrl}`, '',
     'See you there.', 'Favour Ojo',
@@ -134,8 +155,40 @@ export function reminderEmail(kind, firstName, { seat, releaseUrl, qrId } = {}) 
     line: tomorrow ? 'See you tomorrow.' : 'See you tonight.',
     intro: `Hi ${esc(firstName)},<br><br>${lead}`,
     seat,
+    before: true,
     buttons: pill(EVENT.mapsUrl, 'Get directions', true) + (tomorrow ? pill(EVENT.calendarUrl, 'Add to calendar') : ''),
     outro: `${tip}<br><br>See you there.`,
+    releaseUrl,
+    qrId,
+  });
+  return { subject, text, html };
+}
+
+export function beforeEmail(firstName, { seat, releaseUrl, qrId } = {}) {
+  const subject = 'Before you come — Favour & Faves: UNBURDEN';
+  /* Lagos is UTC+1: on the 15th itself say "this evening" */
+  const lagos = new Date(Date.now() + 3600000);
+  const when = lagos.getUTCDate() === 15 && lagos.getUTCMonth() === 10 ? 'This evening' : 'Tomorrow evening';
+  const lead = `${when} we gather for Favour &amp; Faves: UNBURDEN. To help you get the most out of it, here are four small things we’d love you to do before you come.`;
+  const text = [
+    `Hi ${firstName},`, '',
+    lead.replace('&amp;', '&'), '',
+    ...beforeText(), '',
+    ...detailsText(seat), '',
+    `Directions: ${EVENT.mapsUrl}`, '',
+    'Your check-in code is in your confirmation email. At the entrance you can also scan the "Check in here" code.', '',
+    'See you there.', 'Favour Ojo',
+    releaseUrl ? `\nCan't make it any more? Release your seat: ${releaseUrl}` : '',
+  ].join('\n');
+  const html = layout({
+    kicker: 'Before you come &middot; Favour &amp; Faves',
+    line: 'A few things before Sunday.',
+    intro: `Hi ${esc(firstName)},<br><br>${lead}`,
+    details: false,
+    before: true,
+    seat,
+    buttons: pill(EVENT.mapsUrl, 'Get directions', true) + pill(EVENT.calendarUrl, 'Add to calendar'),
+    outro: 'Sunday 15 November, 5:00 PM at Café One, Adeola Odeku, Victoria Island. Come as you are.<br><br>See you there.',
     releaseUrl,
     qrId,
   });

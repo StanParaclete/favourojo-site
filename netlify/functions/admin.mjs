@@ -4,7 +4,7 @@
 
 import { getStore } from '@netlify/blobs';
 import { EVENT, STORE_NAME, json } from '../lib/event.mjs';
-import { SONGS, adminOk, ensureToken, releaseUrl, idFromKey } from '../lib/extras.mjs';
+import { SONGS, adminOk, ensureToken, releaseUrl, idFromKey, runReminders } from '../lib/extras.mjs';
 import { sendConfirmation } from '../lib/email.mjs';
 
 const songTitle = (slug) => (SONGS.find((s) => s.slug === slug) || {}).title || '';
@@ -40,8 +40,10 @@ export default async (req) => {
     let body = {};
     try { body = await req.json(); } catch {}
     if (!adminOk(body.key)) return json(401, { error: 'Wrong password' });
-    if (body.action !== 'resend') return json(400, { error: 'Unknown action' });
-    return json(200, { ok: true, ...(await resendMissing(store)) });
+    if (body.action === 'resend') return json(200, { ok: true, ...(await resendMissing(store)) });
+    /* one-off "Before you come" email; each person gets it once however often it's pressed */
+    if (body.action === 'before') return json(200, { ok: true, ...(await runReminders(store, 'before')) });
+    return json(400, { error: 'Unknown action' });
   }
   if (!adminOk(new URL(req.url).searchParams.get('key'))) return json(401, { error: 'Wrong password' });
 
@@ -49,6 +51,12 @@ export default async (req) => {
     all(store, 'reg/'), all(store, 'walkin/'), all(store, 'wait/'), all(store, 'burden/'),
   ]);
 
+  const live = regsRaw.filter((r) => r.seat > 0);
+  const mails = {
+    tomorrow: live.filter((r) => r.remindedTomorrow).length,
+    before: live.filter((r) => r.sentBefore).length,
+    today: live.filter((r) => r.remindedToday).length,
+  };
   const regs = regsRaw.filter((r) => r.seat > 0).map((r) => ({
     id: r._key.slice(4), no: r.seat, name: r.name, email: r.email, phone: r.phone,
     song: songTitle(r.song), registeredAt: r.registeredAt, emailed: !!r.emailed,
@@ -82,6 +90,7 @@ export default async (req) => {
       emailFailed: regs.filter((r) => !r.emailed).length,
     },
     perDay,
+    mails,
     regs, walkins, waitlist, notes, songs,
   });
 };
