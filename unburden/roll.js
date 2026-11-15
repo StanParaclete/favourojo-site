@@ -7,7 +7,7 @@
   var words = [
     ['Unburden', 'g'], ['•', 'd'], ['Sunday 15 November', ''], ['•', 'd'], ['5 PM', ''], ['•', 'd'],
     ['Café One, Victoria Island', ''], ['•', 'd'], ['Free admission', ''], ['•', 'd'],
-    ['with Favour Ojo', 'g'], ['•', 'd'], ['Registration required', ''], ['•', 'd'],
+    ['with Favour Ojo', 'g'], ['•', 'd'], ['See you tonight', ''], ['•', 'd'],
   ];
 
   function build() {
