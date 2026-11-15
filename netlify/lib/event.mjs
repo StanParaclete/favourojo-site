@@ -24,7 +24,7 @@ export const EVENT = {
   lowWhen: 0,         /* show "Almost full" when this many seats or fewer are left */
 
   /* registration closes when the doors open: 5 PM Lagos = 16:00 UTC */
-  closesAt: '2026-11-15T16:00:00Z',
+  closesAt: '2026-11-15T14:55:00Z',   /* closed early on the day at the organisers' request (was 16:00 UTC) */
 
   /* the walk-in form (for people who come without registering) only works on
      the day: from 1 PM Lagos (12:00 UTC) until midnight */

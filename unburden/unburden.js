@@ -7,7 +7,7 @@
   'use strict';
 
   var STARTS_AT = new Date('2026-11-15T16:00:00Z');   /* 5 PM Lagos */
-  var CLOSES_AT = STARTS_AT;
+  var CLOSES_AT = new Date('2026-11-15T14:55:00Z');   /* closed early on the day, at the organisers' request */
   var PAGE = 'https://favourojo.com/unburden';
   var SHARE_TEXT = 'Join me at Favour & Faves: UNBURDEN, an intimate evening of worship, music and community with Favour Ojo. ' +
                    'Sunday 15 November, 5 PM, Café One, Victoria Island, Lagos. Free, registration required. Register here: ' + PAGE;
